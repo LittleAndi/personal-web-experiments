@@ -1,0 +1,13 @@
+{
+  "experiments": [
+    {
+      "name": "example-experiment",
+      "path": "example-experiment",
+      "appLocation": "/",
+      "outputLocation": "",
+      "appBuildCommand": "",
+      "apiLocation": "",
+      "skipAppBuild": true
+    }
+  ]
+}

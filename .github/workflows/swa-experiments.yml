@@ -1,0 +1,123 @@
+name: Deploy Experiments To Azure Static Web Apps
+
+on:
+    pull_request:
+        types: [ opened, synchronize, reopened, closed ]
+    push:
+        branches:
+            - main
+
+permissions:
+    contents: read
+    pull-requests: write
+
+jobs:
+    detect_changes:
+        runs-on: ubuntu-latest
+        outputs:
+            matrix: ${{ steps.detect.outputs.matrix }}
+            has_changes: ${{ steps.detect.outputs.has_changes }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Set compare SHAs
+              id: compare
+              run: |
+                  if [ "${{ github.event_name }}" = "pull_request" ]; then
+                    echo "base_sha=${{ github.event.pull_request.base.sha }}" >> "$GITHUB_OUTPUT"
+                    echo "head_sha=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "base_sha=${{ github.event.before }}" >> "$GITHUB_OUTPUT"
+                    echo "head_sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Resolve changed experiments
+              id: detect
+              env:
+                  BASE_SHA: ${{ steps.compare.outputs.base_sha }}
+                  HEAD_SHA: ${{ steps.compare.outputs.head_sha }}
+              run: node scripts/resolve-changed-experiments.mjs
+
+    deploy_preview:
+        if: github.event_name == 'pull_request' && github.event.action != 'closed' &&
+            needs.detect_changes.outputs.has_changes == 'true'
+        needs: detect_changes
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                experiment: ${{ fromJson(needs.detect_changes.outputs.matrix) }}
+        concurrency:
+            group: swa-preview-${{ matrix.experiment.name }}
+            cancel-in-progress: true
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Deploy preview environment
+              id: deploy
+              uses: Azure/static-web-apps-deploy@v1
+              with:
+                  azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+                  repo_token: ${{ secrets.GITHUB_TOKEN }}
+                  action: upload
+                  app_location: ${{ matrix.experiment.path }}${{ matrix.experiment.appLocation }}
+                  output_location: ${{ matrix.experiment.outputLocation }}
+                  app_build_command: ${{ matrix.experiment.appBuildCommand }}
+                  api_location: ${{ matrix.experiment.apiLocation }}
+                  skip_app_build: ${{ matrix.experiment.skipAppBuild }}
+                  deployment_environment: ${{ matrix.experiment.name }}
+
+            - name: Summary
+              run: |
+                  echo "### Preview deployed" >> "$GITHUB_STEP_SUMMARY"
+                  echo "- Experiment: ${{ matrix.experiment.name }}" >> "$GITHUB_STEP_SUMMARY"
+                  echo "- Path: ${{ matrix.experiment.path }}" >> "$GITHUB_STEP_SUMMARY"
+
+    deploy_production:
+        if: github.event_name == 'push' && needs.detect_changes.outputs.has_changes ==
+            'true'
+        needs: detect_changes
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                experiment: ${{ fromJson(needs.detect_changes.outputs.matrix) }}
+        concurrency:
+            group: swa-production-${{ matrix.experiment.name }}
+            cancel-in-progress: true
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Deploy production
+              uses: Azure/static-web-apps-deploy@v1
+              with:
+                  azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+                  repo_token: ${{ secrets.GITHUB_TOKEN }}
+                  action: upload
+                  app_location: ${{ matrix.experiment.path }}${{ matrix.experiment.appLocation }}
+                  output_location: ${{ matrix.experiment.outputLocation }}
+                  app_build_command: ${{ matrix.experiment.appBuildCommand }}
+                  api_location: ${{ matrix.experiment.apiLocation }}
+                  skip_app_build: ${{ matrix.experiment.skipAppBuild }}
+
+    close_preview:
+        if: github.event_name == 'pull_request' && github.event.action == 'closed'
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                experiment: ${{ fromJson(needs.detect_changes.outputs.matrix) }}
+        needs: detect_changes
+        steps:
+            - name: Close preview environment
+              uses: Azure/static-web-apps-deploy@v1
+              with:
+                  azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+                  repo_token: ${{ secrets.GITHUB_TOKEN }}
+                  action: close
+                  deployment_environment: ${{ matrix.experiment.name }}

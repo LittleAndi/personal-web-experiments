@@ -131,3 +131,50 @@ Optional dependency by stack:
 
 - This repository is preference-driven and intentionally subjective.
 - Keep the baseline prompt stable to make comparisons meaningful.
+
+## Azure Static Web App Preview Deployments
+
+This repository now includes a single GitHub Actions workflow for per-experiment deployments:
+
+- Workflow: `.github/workflows/swa-experiments.yml`
+- Experiment mapping: `deploy/experiments.json`
+- Change detection script: `scripts/resolve-changed-experiments.mjs`
+
+### How It Works
+
+1. On pull requests, the workflow detects which experiment folders changed.
+2. It deploys only those experiments to named preview environments in one Azure Static Web App.
+3. On pushes to `main`, it deploys only changed experiments to production.
+4. On PR close, it runs a close action for the mapped preview environments.
+
+### One-Time Setup
+
+1. Create or reuse one Azure Static Web App.
+2. Add repository secret `AZURE_STATIC_WEB_APPS_API_TOKEN` with your deployment token.
+3. Update `deploy/experiments.json` so each experiment folder has a matching entry.
+
+### Configure Experiments
+
+Each object in `deploy/experiments.json` supports:
+
+- `name`: Stable environment name for preview deployment.
+- `path`: Experiment folder at repository root.
+- `appLocation`: App root inside that experiment folder (default `/`).
+- `outputLocation`: Build output folder (empty for static content at app root).
+- `appBuildCommand`: Optional build command.
+- `apiLocation`: Optional Azure Functions API path.
+- `skipAppBuild`: Whether to skip build in SWA action.
+
+Example:
+
+```json
+{
+  "name": "cursor-gpt-53-codex",
+  "path": "cursor-gpt-53-codex",
+  "appLocation": "/",
+  "outputLocation": "dist",
+  "appBuildCommand": "npm run build",
+  "apiLocation": "",
+  "skipAppBuild": false
+}
+```
