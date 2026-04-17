@@ -4,6 +4,27 @@ Your task is to generate a complete, production-ready personal portfolio website
 
 ---
 
+# 🧠 REQUIRED SKILL WORKFLOW
+
+Before generating code, you MUST use the impeccable design skill.
+
+Run:
+
+- `/impeccable craft personal portfolio website for Lars Nyström`
+
+Apply the impeccable output and constraints while implementing this prompt.
+
+Mandatory constraints from impeccable:
+
+- Avoid generic AI aesthetics and boilerplate layout patterns
+- Use intentional typography and a clear visual direction
+- Use purposeful motion only where it improves UX
+- Keep the UI production-grade, cohesive, and responsive
+- Do not use gradient text
+- Do not use thick left/right accent stripes on cards/callouts
+
+---
+
 # 🎯 GOAL
 
 Build a clean, modern, minimal personal website that presents:
