@@ -37,6 +37,7 @@ What it does:
 4. Copies all local skills (`.agents/skills`) into the new folder.
 5. Generates a tool-appropriate `.gitignore`.
 6. Validates required files/folders exist.
+7. Suggests a feature branch name and the create-and-checkout command.
 
 Suggested invocation in Copilot Chat:
 

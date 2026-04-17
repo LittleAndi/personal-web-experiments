@@ -1,7 +1,7 @@
 ---
 name: new-experiment
-description: Create a new experiment folder by asking for tool and model, then copy the base prompt, all local skills, and a suitable .gitignore.
-version: 1.1.0
+description: Create a new experiment folder by asking for tool and model, then copy the base prompt, all local skills, add a suitable .gitignore, and suggest a feature branch name.
+version: 1.2.0
 user-invocable: true
 argument-hint: "[tool and model, optional]"
 ---
@@ -73,10 +73,19 @@ into the new experiment folder so future work can start there.
 - Confirm `.gitignore` is non-empty and appropriate for the selected tool.
 - Report created path, copied files, and the `.gitignore` profile used.
 
+7. Suggest Feature Branch
+
+- Suggest a feature branch name based on the normalized experiment folder name.
+- Use this format: `feature/experiment-<tool>-<model>`.
+- Provide the exact command to create and check out the branch:
+  - `git checkout -b <suggested-branch-name>`
+- Do not run git branch commands automatically unless the user explicitly asks.
+
 ## Safety Rules
 
 - Do not delete any existing experiment folders.
 - Do not run destructive git commands.
+- Do not create or switch git branches automatically unless explicitly requested.
 - If a required source path is missing, stop and report exactly what is missing.
 
 ## PowerShell Reference (Preferred)
