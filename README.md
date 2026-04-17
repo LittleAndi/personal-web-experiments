@@ -150,8 +150,20 @@ This repository now includes a single GitHub Actions workflow for per-experiment
 ### One-Time Setup
 
 1. Create or reuse one Azure Static Web App.
-2. Add repository secret `AZURE_STATIC_WEB_APPS_API_TOKEN` with your deployment token.
-3. Update `deploy/experiments.json` so each experiment folder has a matching entry.
+2. Get the Static Web App deployment token in Azure Portal:
+
+- Open your Static Web App resource.
+- In the resource overview, select **Manage deployment token**.
+- Copy the token value.
+
+3. Add repository secret `AZURE_STATIC_WEB_APPS_API_TOKEN` in GitHub:
+
+- Go to **Settings** > **Secrets and variables** > **Actions**.
+- Create a new repository secret named `AZURE_STATIC_WEB_APPS_API_TOKEN`.
+- Paste the deployment token and save.
+
+4. If the token is exposed, regenerate it from **Manage deployment token** in Azure and update the same GitHub secret.
+5. Update `deploy/experiments.json` so each experiment folder has a matching entry.
 
 ### Configure Experiments
 
