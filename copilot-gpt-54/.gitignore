@@ -1,0 +1,24 @@
+# Generic defaults
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
+logs/
+.env
+.env.*
+node_modules/
+
+# Common temp/build
+dist/
+build/
+.cache/
+coverage/
+.tmp/
+*.tsbuildinfo
+
+# Generated config outputs
+vite.config.js
+vite.config.d.ts
+tailwind.config.js
+tailwind.config.d.ts
