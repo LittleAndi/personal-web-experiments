@@ -8,6 +8,15 @@
       "appBuildCommand": "",
       "apiLocation": "",
       "skipAppBuild": true
+    },
+    {
+      "name": "copilot-gpt-54",
+      "path": "copilot-gpt-54",
+      "appLocation": "/",
+      "outputLocation": "",
+      "appBuildCommand": "",
+      "apiLocation": "",
+      "skipAppBuild": true
     }
   ]
 }

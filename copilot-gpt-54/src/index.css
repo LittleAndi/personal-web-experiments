@@ -1,0 +1,70 @@
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Public+Sans:wght@300;400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --color-canvas: oklch(0.16 0.01 240);
+  --color-surface: oklch(0.2 0.012 240);
+  --color-surface-strong: oklch(0.24 0.014 240);
+  --color-line: oklch(0.34 0.016 240 / 0.55);
+  --color-text: oklch(0.93 0.01 240);
+  --color-muted: oklch(0.74 0.012 240);
+  --color-accent: oklch(0.72 0.12 192);
+  --color-accent-soft: oklch(0.34 0.05 192 / 0.22);
+}
+
+html.theme-light {
+  color-scheme: light;
+  --color-canvas: oklch(0.97 0.004 205);
+  --color-surface: oklch(0.995 0.003 205);
+  --color-surface-strong: oklch(0.94 0.006 205);
+  --color-line: oklch(0.84 0.01 205 / 0.8);
+  --color-text: oklch(0.22 0.012 230);
+  --color-muted: oklch(0.48 0.012 220);
+  --color-accent: oklch(0.56 0.13 198);
+  --color-accent-soft: oklch(0.78 0.05 198 / 0.28);
+}
+
+@layer base {
+  * {
+    @apply border-line;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply min-h-screen bg-canvas font-sans text-base text-text antialiased;
+  }
+
+  #root {
+    @apply min-h-screen;
+  }
+
+  a {
+    @apply transition-colors duration-200;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-accent) 34%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
